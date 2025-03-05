@@ -257,7 +257,10 @@ def main():
                     height=800
                 )
             else:
-                st.info("No guidelines match your current filter criteria. Try adjusting your filters.")
+                st.info("No guidelines match your current filter criteria. Try adjusting your filters")
+
+
+
 
 
         
