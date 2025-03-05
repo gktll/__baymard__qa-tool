@@ -111,7 +111,7 @@ def main():
 
             with right_col:
                 # Open the summary box container.
-                st.markdown("#### Guidelines")
+                st.markdown("#### Dataset Summary")
                 
                 # First row: two columns
                 row1_cols = st.columns(2)
@@ -127,30 +127,35 @@ def main():
                     st.metric("App Guidelines", overall_app)
                     
             st.markdown("######")
-
-            # Filtering section
-            search_term = st.text_input("🔍 Search Guidelines", "")
-
+ 
             col1, col2, col3 = st.columns(3)
             with col1:
-                theme_filter = st.selectbox(
-                    "Filter by Theme",
-                    ["All"] + sorted([x for x in df['Catalog Theme Title'].unique() if pd.notna(x)])
-                )
-            with col2:
-                case_study_filter = st.selectbox(
-                    "Filter by Case Study",
-                    ["All"] + sorted([x for x in df['Case Study Title'].unique() if pd.notna(x)])
-                )
-            with col3:
                 platform_filter = st.multiselect(
                     "Filter by Platform",
                     ["Desktop", "Mobile", "App"],
                     default=["Desktop", "Mobile", "App"]
                 )
+                
+            with col2:
+                theme_filter = st.selectbox(
+                    "Filter by Theme",
+                    ["All"] + sorted([x for x in df['Catalog Theme Title'].unique() if pd.notna(x)])
+                )
+            with col3:
+                case_study_filter = st.selectbox(
+                    "Filter by Case Study",
+                    ["All"] + sorted([x for x in df['Case Study Title'].unique() if pd.notna(x)])
+                )
 
-            low_cost_filter = st.checkbox("Is Low Cost")
-            sort_by_impact = st.checkbox("High to Low Impact")
+            col1, col2, col3 = st.columns([4, 1, 1])
+            with col1:
+                # search_term = st.text_input("🔍 Search Guidelines", "")
+                search_term = st.text_input("Search", placeholder="🔍  Search by title, citation code, theme...", label_visibility="collapsed")
+            with col2:
+                low_cost_filter = st.checkbox("Is Low Cost")
+            with col3:
+                sort_by_impact = st.checkbox("High to Low Impact")
+
 
             filtered_df = apply_chart_filters(
                 df,
@@ -181,6 +186,7 @@ def main():
 
             st.markdown("######")
 
+
             if not filtered_df.empty:
                 display_df = filtered_df.sort_values(['Citation Code: Platform-Specific'])
                 
@@ -190,7 +196,8 @@ def main():
                     'Case Study Title',
                     'Title',
                     'Judgement',
-                    'Gemini URL'
+                    'Gemini URL',
+                    'Image URLs'
                 ]].rename(columns={
                     'Citation Code: Platform-Specific': 'Citation',
                     'Case Study Title': 'Site',
@@ -246,11 +253,12 @@ def main():
                 st.dataframe(
                     styled_df,
                     column_config={
-                        "Citation": st.column_config.TextColumn("Citation", width="small"),
-                        "Site": st.column_config.TextColumn("Site", width="small"),
-                        "Judgement": st.column_config.TextColumn("Judgment", width="small"),
+                        "Citation": st.column_config.TextColumn("Citation", width="auto"),
+                        "Site": st.column_config.TextColumn("Site", width="auto"),
+                        "Judgement": st.column_config.TextColumn("Judgment", width="auto"),
                         "Title": st.column_config.TextColumn("Title", width="auto"),
-                        "Gemini URL": st.column_config.LinkColumn("Link", display_text="View in Gemini", width="small")
+                        "Gemini URL": st.column_config.LinkColumn("Gemini", display_text="Open", width="auto"),
+                        "Image URLs": st.column_config.TextColumn("Images", width="auto")
                     },
                     use_container_width=True,
                     hide_index=True,
