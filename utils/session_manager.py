@@ -16,25 +16,6 @@ def save_uploaded_file(uploaded_file):
     return file_path
 
 
-
-import os
-import pandas as pd
-import streamlit as st
-
-UPLOAD_FOLDER = "uploaded_files"
-
-def save_uploaded_file(uploaded_file):
-    """Saves uploaded file to a designated folder and returns its path."""
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
-    
-    file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    
-    return file_path
-
-
 def load_csv(file_path: str) -> pd.DataFrame:
     """Load and clean CSV file **before any other processing**."""
     try:

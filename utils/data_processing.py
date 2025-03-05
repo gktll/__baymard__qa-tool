@@ -1,10 +1,10 @@
+# utils/data_processing.py
+
 import pandas as pd
 import streamlit as st
 import re
 from typing import Dict
 import os
-
-
 
 def compute_overall_statistics(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -33,7 +33,6 @@ def compute_overall_statistics(df: pd.DataFrame) -> pd.DataFrame:
         "Mobile": [mobile_count],
         "App": [app_count]
     })
-
 
 
 def apply_chart_filters(
@@ -109,8 +108,6 @@ def apply_chart_filters(
             filtered_df = filtered_df.drop(columns=["impact_numeric"])
 
     return filtered_df
-
-
 
 
 def process_datasets(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
@@ -212,7 +209,6 @@ def process_datasets(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
         ]
         processed_dfs['11. High-Impact Guidelines'] = high_impact_df
 
-    
 
     #--------------------------------------------------------------
     # Make a df copy to keep the original untouched and modify 'ID' to 'Guideline' in df_temp
@@ -229,8 +225,6 @@ def process_datasets(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     # Convert the inconsistencies list to a DataFrame and to csv
     inconsistencies_df = pd.DataFrame(inconsistencies)
     processed_dfs['Judgment Inconsistencies'] = inconsistencies_df
-
-
 
 
     #--------------------------------------------------------------
@@ -260,9 +254,6 @@ def process_datasets(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
             processed_dfs['SItes by Deviation'] = inconsistency_records
     else:
         print("⚠️ Missing columns for deviation analysis.")
-
-
-
 
     return processed_dfs
 

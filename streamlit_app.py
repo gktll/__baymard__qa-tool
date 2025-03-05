@@ -1,5 +1,8 @@
+# app.py
+
 import streamlit as st
 import pandas as pd
+import numpy as np
 import os
 from streamlit_plotly_events import plotly_events
 
@@ -9,10 +12,6 @@ from utils.data_processing import compute_overall_statistics, apply_chart_filter
 from utils.tab1_qa_game.visualizations import create_pills_visualization
 from utils.tab2_downloads.downloads import display_download_options
 from utils.tab4_presentation.presentation import presentation_tab_4
-
-from utils.chat import chat_interface
-
-import plotly.express as px
 
 
 st.set_page_config(
@@ -182,32 +181,86 @@ def main():
 
             st.markdown("######")
 
-            # Table Section.
-            st.dataframe(
-                filtered_df[[
+            if not filtered_df.empty:
+                display_df = filtered_df.sort_values(['Citation Code: Platform-Specific'])
+                
+                # Create a display dataframe with the columns we want to show
+                display_df = display_df[[
                     'Citation Code: Platform-Specific',
                     'Case Study Title',
                     'Title',
                     'Judgement',
-                    'Importance Key',
                     'Gemini URL'
                 ]].rename(columns={
                     'Citation Code: Platform-Specific': 'Citation',
                     'Case Study Title': 'Site',
                     'Title': 'Title'
-                }),
-                column_config={
-                    "Citation": st.column_config.TextColumn("Citation", width="small"),
-                    "Site": st.column_config.TextColumn("Site", width="small"),
-                    "Title": st.column_config.TextColumn("Title", width="auto"),
-                    "Judgement": st.column_config.TextColumn("Judgment", width="small"),
-                    "Importance Key": st.column_config.TextColumn("Importance", width="small"),
-                    "Gemini URL": st.column_config.LinkColumn("Link", display_text="View in Gemini", width="small")
-                },
-                use_container_width=True,
-                hide_index=True,
-                height=800
-            )
+                })
+                
+                # Create a mapping of each unique citation to an alternating style
+                unique_citations = display_df['Citation'].unique()
+                citation_style_map = {citation: i % 2 for i, citation in enumerate(unique_citations)}
+                
+                # Define styling function
+                def style_rows(row):
+                    # Get the citation for this row
+                    citation = row['Citation']
+                    
+                    # Determine if this is an even or odd group
+                    group_num = citation_style_map.get(citation, 0)
+                    
+                    # Apply row styling based on group number
+                    if group_num == 0:
+                        bg_color = '#1e1f24'  # Darker background for even groups
+                    else:
+                        bg_color = '#2c2d33'  # Lighter background for odd groups
+                    
+                    # Create styles for each column
+                    styles = ['background-color: ' + bg_color] * len(row)
+                    
+                    # Override style for judgment column
+                    judgment = row['Judgement']
+                    judgment_str = str(judgment).lower().strip() if not pd.isna(judgment) else 'not_rated'
+                    color_map = {
+                        'adhered_high': '#769b37',
+                        'adhered_low': '#a1b145',
+                        'violated_high': '#b42625',
+                        'violated_low': '#ea7a0d',
+                        'not_applicable': '#9c9c9c',
+                        'neutral': '#ffc302',
+                        'issue_resolved': '#0273ff',
+                        'not_rated': 'rgba(255,255,255,0.3)'
+                    }
+                    judgment_color = color_map.get(judgment_str, '#FFFFFF')
+                    
+                    # Find judgment column index
+                    judgment_idx = list(row.index).index('Judgement')
+                    styles[judgment_idx] = f'background-color: {judgment_color}; color: white; font-weight: bold'
+                    
+                    return styles
+                
+                # Apply styling
+                styled_df = display_df.style.apply(style_rows, axis=1)
+                
+                # Display the styled dataframe
+                st.dataframe(
+                    styled_df,
+                    column_config={
+                        "Citation": st.column_config.TextColumn("Citation", width="small"),
+                        "Site": st.column_config.TextColumn("Site", width="small"),
+                        "Judgement": st.column_config.TextColumn("Judgment", width="small"),
+                        "Title": st.column_config.TextColumn("Title", width="auto"),
+                        "Gemini URL": st.column_config.LinkColumn("Link", display_text="View in Gemini", width="small")
+                    },
+                    use_container_width=True,
+                    hide_index=True,
+                    height=800
+                )
+            else:
+                st.info("No guidelines match your current filter criteria. Try adjusting your filters.")
+
+
+        
 
     # ---------- TAB 2: QA Downloads ----------
     with tab2:
@@ -217,16 +270,7 @@ def main():
         
         display_download_options()
 
-    # ---------- TAB 3: Chat ----------
-    # with tab3:
-    #     if "df" not in st.session_state or st.session_state.df is None:
-    #         st.warning("Please upload a file first in the Overview tab")
-    #         return
-            
-    #     chat_interface(st.session_state.df)
-    
-    # ---------- TAB 4: Presentation ----------
-
+    # ---------- TAB 3: Presentation ----------
     with tab3:
         presentation_tab_4(df)
 

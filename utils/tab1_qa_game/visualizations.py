@@ -1,4 +1,6 @@
 
+# visualizations.py
+
 import plotly.graph_objects as go
 from ..helpers import get_judgment_color
 
@@ -11,8 +13,8 @@ def create_pills_visualization(input_df, title=""):
     num_rows = (total_pills + pills_per_row - 1) // pills_per_row  
 
     dot_size = 15
-    dot_spacing_x = dot_size * 0.5  # Horizontal spacing
-    dot_spacing_y = dot_size * 2    # Vertical spacing
+    dot_spacing_x = dot_size * 0.5  
+    dot_spacing_y = dot_size * 2    
 
     # Build hover text for each pill.
     df['hover_text'] = (
