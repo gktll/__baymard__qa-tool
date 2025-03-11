@@ -127,7 +127,11 @@ def main():
                     st.metric("App Guidelines", overall_app)
                     
             st.markdown("######")
- 
+
+
+            #
+            # Filtering
+            #               
             col1, col2, col3 = st.columns(3)
             with col1:
                 platform_filter = st.multiselect(
@@ -169,7 +173,10 @@ def main():
 
             st.markdown("######")        
 
+
+            # 
             # Visualization Section.
+            #
             fig = create_pills_visualization(filtered_df, title="")
 
             selected_points = plotly_events(fig, click_event=True)
@@ -186,6 +193,10 @@ def main():
 
             st.markdown("######")
 
+
+            #
+            # Table
+            #  
 
             if not filtered_df.empty:
                 display_df = filtered_df.sort_values(['Citation Code: Platform-Specific'])
@@ -271,7 +282,6 @@ def main():
 
 
 
-        
 
     # ---------- TAB 2: QA Downloads ----------
     with tab2:
